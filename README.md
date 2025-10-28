@@ -23,6 +23,65 @@ Goal : Build a **VR-ready 2D storytelling system** for children — where a **La
 | **Phase 5 – Narration**                 | Integrate TTS for voiceover                  | Generate `.wav` per dialogue, play in Godot        |
 | **Phase 6 – Video Export & Polishing**  | Record scenes as lessons                     | Add transitions, titles, moral text overlays       |
 
+```
+
+  ┌───────────────────────────────┐
+  │        LangGraph Agent        │
+  │  (Generates story events)     │
+  └──────────────┬────────────────┘
+                 │ JSON (actions)
+                 │
+  ...............▼.................................
+  :             FastAPI Bridge                     :
+  :  (Receives events, exposes API)                :
+  :................................................:
+                 │ HTTP / WebSocket
+                 │
+  ┌──────────────▼────────────────┐
+  │          Godot Engine         │
+  │  - HTTP Listener (main.gd)    │
+  │  - Scene Manager (2D/VR)      │
+  └──────────────┬────────────────┘
+                 │ Visual / Audio Output
+                 │
+        ┌────────▼────────┐
+        │     VR User     │
+        │ (Headset View)  │
+        └─────────────────┘
+```
+
+```
+  Start
+    │
+    ▼
+  Load Story JSON
+    │
+    ▼
+  Initialize FastAPI + Godot Listener
+    │
+    ▼
+  LangGraph Reads Event
+    │
+    ▼
+  Send Event → FastAPI (/update_scene)
+    │
+    ▼
+  Godot Fetches Event (/get_event)
+    │
+    ▼
+  Interpret Action (move / color / speak)
+    │
+    ▼
+  Update Scene Objects
+    │
+    ▼
+  Render Scene in VR
+    │
+    ├──► More Events? ──► Yes → Loop Back
+    │
+    └──► No → End
+
+```
 
 
 
