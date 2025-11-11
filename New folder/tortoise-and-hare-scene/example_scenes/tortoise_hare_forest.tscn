@@ -1,0 +1,86 @@
+[gd_scene load_steps=13 format=3 uid="uid://bvn06ojc2lwjh"]
+
+[ext_resource type="PackedScene" uid="uid://cd7hgp6sxqfld" path="res://assets/animals/desert_tortoise.glb" id="1"]
+[ext_resource type="PackedScene" uid="uid://bhfwmkgscue30" path="res://assets/nature_kit/bed_floor.glb" id="2"]
+[ext_resource type="PackedScene" uid="uid://u2mtwqswi3m5" path="res://assets/nature_kit/tree_default.glb" id="3"]
+[ext_resource type="PackedScene" uid="uid://wdqf1tm7tvek" path="res://assets/nature_kit/tree_small.glb" id="4"]
+[ext_resource type="PackedScene" uid="uid://c5namyvyrxkw5" path="res://assets/nature_kit/rock_largeA.glb" id="5"]
+[ext_resource type="PackedScene" uid="uid://w3i44v71ou0t" path="res://assets/nature_kit/grass_large.glb" id="6"]
+[ext_resource type="PackedScene" uid="uid://k1rs4vjy0au5" path="res://assets/nature_kit/bridge_wood.glb" id="7"]
+
+[sub_resource type="ProceduralSkyMaterial" id="1"]
+sky_top_color = Color(0.65, 0.85, 1, 1)
+sky_horizon_color = Color(0.85, 0.93, 0.99, 1)
+sky_curve = 0.5
+
+[sub_resource type="Sky" id="2"]
+sky_material = SubResource("1")
+
+[sub_resource type="Environment" id="3"]
+background_mode = 2
+sky = SubResource("2")
+ambient_light_source = 2
+ambient_light_energy = 0.8
+tonemap_mode = 1
+tonemap_exposure = 0.8
+fog_enabled = true
+fog_light_color = Color(0.9, 0.95, 1, 1)
+fog_density = 0.02
+
+[sub_resource type="StandardMaterial3D" id="4"]
+albedo_color = Color(0.53, 0.78, 0.43, 1)
+
+[sub_resource type="PlaneMesh" id="5"]
+size = Vector2(1, 1)
+
+[node name="Root" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("3")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.8660254, -0.35355338, 0.35355338, 0, 0.70710677, 0.70710677, -0.5, -0.6123724, 0.6123724, 0, 0, 0)
+light_color = Color(1, 0.97, 0.9, 1)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9848077, 0.17364818, 0, -0.17364818, 0.9848077, 0, 2, 6)
+current = true
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(10, 0, 0, 0, 1, 0, 0, 0, 10, 0, 0, 0)
+material_override = SubResource("4")
+mesh = SubResource("5")
+
+[node name="Tortoise" parent="." instance=ExtResource("1")]
+
+[node name="BedFloor" parent="." instance=ExtResource("2")]
+transform = Transform3D(3, 0, 0, 0, 1, 0, 0, 0, 3, 0, -0.05, 0)
+
+[node name="Tree1" parent="." instance=ExtResource("3")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 3, 0, -2)
+
+[node name="Tree2" parent="." instance=ExtResource("4")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, -2, 0, 2)
+
+[node name="Tree3" parent="." instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 4)
+
+[node name="Rock1" parent="." instance=ExtResource("5")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 2, 0, 1)
+
+[node name="Rock2" parent="." instance=ExtResource("5")]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, -3, 0, -1)
+
+[node name="Grass1" parent="." instance=ExtResource("6")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 1, 0, 3)
+
+[node name="Grass2" parent="." instance=ExtResource("6")]
+transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, -2, 0, -3)
+
+[node name="Grass3" parent="." instance=ExtResource("6")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 3, 0, -4)
+
+[node name="Bridge" parent="." instance=ExtResource("7")]
+transform = Transform3D(-1.5, 0, -1.3113416e-07, 0, 1.5, 0, 1.3113416e-07, 0, -1.5, 0, 0, -5)

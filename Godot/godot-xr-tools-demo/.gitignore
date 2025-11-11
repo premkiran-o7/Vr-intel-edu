@@ -1,0 +1,13 @@
+*.o
+*.os
+.import/
+.godot/
+*.dblite
+*.exp
+*.lib
+*.obj
+*.TMP
+logs
+Thumbs.db
+android/
+.venv/

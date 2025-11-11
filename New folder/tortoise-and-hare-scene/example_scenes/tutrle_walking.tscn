@@ -1,0 +1,70 @@
+[gd_scene load_steps=9 format=3 uid="uid://6ljtarhcwcrf"]
+
+[ext_resource type="PackedScene" uid="uid://cd7hgp6sxqfld" path="res://assets/animals/desert_tortoise.glb" id="1"]
+
+[sub_resource type="ProceduralSkyMaterial" id="1"]
+sky_top_color = Color(0.65, 0.85, 1, 1)
+sky_horizon_color = Color(0.85, 0.93, 0.99, 1)
+sky_curve = 0.5
+
+[sub_resource type="Sky" id="2"]
+sky_material = SubResource("1")
+
+[sub_resource type="Environment" id="3"]
+background_mode = 2
+sky = SubResource("2")
+ambient_light_source = 2
+ambient_light_energy = 0.8
+
+[sub_resource type="StandardMaterial3D" id="5"]
+albedo_color = Color(0.53, 0.78, 0.43, 1)
+
+[sub_resource type="PlaneMesh" id="4"]
+size = Vector2(1, 1)
+
+[sub_resource type="Animation" id="6"]
+resource_name = "walk_forward"
+length = 3.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sketchfab_Scene:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, -3)]
+}
+
+[sub_resource type="AnimationLibrary" id="7"]
+_data = {
+&"walk_forward": SubResource("6")
+}
+
+[node name="Root" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("3")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.8660254, -0.35355338, 0.35355338, 0, 0.70710677, 0.70710677, -0.5, -0.6123724, 0.6123724, 0, 0, 0)
+light_energy = 1.2
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9848077, 0.17364818, 0, -0.17364818, 0.9848077, 0, 2, 6)
+current = true
+
+[node name="Ground" type="MeshInstance3D" parent="."]
+transform = Transform3D(10, 0, 0, 0, 1, 0, 0, 0, 10, 0, 0, 0)
+material_override = SubResource("5")
+mesh = SubResource("4")
+
+[node name="Sketchfab_Scene" parent="." instance=ExtResource("1")]
+
+[node name="AnimPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("7")
+}
+autoplay = "walk_forward"
