@@ -41,7 +41,7 @@ if st.button("Send Message"):
         with st.spinner("Talking to the agent..."):
             try:
                 resp = requests.post(f"{API_URL}/chat", json={"user_input": user_input})
-                if resp.status_code == 200:
+                if resp:
                     st.success("Agent reply:")
                     st.info(resp.json()["agent_reply"])
                 else:

@@ -1,5 +1,46 @@
 # Vr-intel-edu
 
+Download godot from [here](https://godotengine.org/download/windows), the one above
+
+
+You will get two:
+- Godot_v4.5.1-stable_win64_console.exe
+- Godot\Godot_v4.5.1-stable_win64.exe
+
+
+this Godot\Godot_v4.5.1-stable_win64.exe creates a applicationa nd can open the app with this
+
+screen for project selection will be there 
+
+select this
+`New folder\tortoise-and-hare-scene`
+
+
+Then There will be `Project` above 
+Go there then
+
+> Project settings
+> Run (second option)
+> select main scene 
+
+There will be a scene named story_controller.tscn , select that
+
+In the bottom left space click on that file and press Function6 (F6)
+
+
+All the scenes will be in scenes folder in the bottom left panel
+
+Click on AnimPlayer on the top left panel after selecting a scene 
+
+
+In teh bottom there will be output debug Animation
+
+After clicking animation, teher will be a small bar which has animations, select them and click pay
+
+
+
+
+
 
 Goal : Build a **VR-ready 2D storytelling system** for children — where a **LangGraph agent** in Python drives animations, character attributes, and scenes inside **Godot** through a **FastAPI bridge**.
 

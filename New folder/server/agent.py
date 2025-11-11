@@ -1,19 +1,13 @@
 # agent.py
 from typing import Dict, Any
 from pydantic import BaseModel
-from secrets import load_env
+from server.secrets import load_env
 
-# Try/except guard so import-time errors are clearer in dev
-try:
-    from langchain_groq import ChatGroq
-    from langchain.schema import HumanMessage, SystemMessage
-except Exception as e:
-    # If you don't have langchain_groq installed during quick local edits,
-    # this makes the error clearer rather than failing with an ImportError stack trace later.
-    ChatGroq = None  # type: ignore
-    HumanMessage = None  # type: ignore
-    SystemMessage = None  # type: ignore
-    _IMPORT_ERROR = e  # keep for debugging
+
+from langchain.chat_models import init_chat_model
+from langchain_core.messages.human import HumanMessage
+from langchain_core.messages.system import SystemMessage
+
 
 class StoryAgent:
     """
@@ -24,14 +18,10 @@ class StoryAgent:
 
     def __init__(self, model_name: str = "llama3-70b"):
         groq_key = load_env()
-        if ChatGroq is None:
-            raise RuntimeError(
-                "langchain_groq (or dependent packages) not available. Import error: "
-                f"{getattr(globals(), '_IMPORT_ERROR', 'unknown')}"
-            )
+        
 
         # Initialize the model client (lightweight wrapper used by agent)
-        self.llm = ChatGroq(model=model_name, groq_api_key=groq_key)
+        self.llm = init_chat_model(model="openai/gpt-oss-20b", groq_api_key=groq_key, model_provider="groq")
 
         # A short system prompt to keep responses consistent
         self.system_prompt = (
@@ -62,37 +52,72 @@ class StoryAgent:
             # graceful fallback
             return self.status_message()
 
-    def build_scene_event(
-        self,
-        event_id: str = "evt-000",
-        scene_type: str = "scene_update",
-        dialogue: str = None,
-        choices: list = None,
-        emotion_tag: str = "neutral",
-    ) -> Dict[str, Any]:
-        """
-        Build the canonical event JSON that Godot will consume.
+def build_scene_event(
+    self,
+    event_id: str = "evt-000",
+    scene_type: str = "scene_update",
+    context: str = None,
+    emotion_tag: str = "neutral",
+) -> Dict[str, Any]:
+    """
+    Build a dynamic event JSON using LLM output for dialogue and choices.
+    Godot will consume this for scene rendering.
 
-        Keep fields optional and minimal. Godot will ignore unknown keys.
-        """
-        # Default dialogue if none provided
-        dialogue = dialogue or "We’re still building the live integration. Scenes will be available soon."
-        choices = choices or []
+    The LLM response is expected to include 'dialogue' and optionally 'choices'.
+    """
 
-        event = {
-            "id": event_id,
-            "type": scene_type,
-            "bg": "forest_day.png",
-            "left": {"sprite": "tortoise_idle.png", "pos": [120, 250], "emotion": "calm"},
-            "right": {"sprite": "hare_idle.png", "pos": [420, 250], "emotion": "arrogant"},
-            "dialogue": dialogue,
-            "tts": {"voice": "sara-child", "rate": 0.95},
-            "choices": choices,
-            "delay": 2.5,
-            "metadata": {"emotion_tag": emotion_tag, "difficulty": "easy"},
-        }
+    # Prepare the LLM prompt
+    prompt = f"""
+    You are generating a narrative scene event for a game.
 
-        return event
+    Context:
+    {context or "A short story involving a hare and a tortoise."}
+
+    Task:
+    - Generate a short, emotionally expressive dialogue for this scene.
+    - Optionally suggest 2–3 player choices if relevant.
+    - Each choice should be concise and advance the story logically.
+    - Return only valid JSON with fields 'dialogue' and 'choices'.
+    - Example:
+      {{
+        "dialogue": "The hare laughs: 'You’ll never beat me!'",
+        "choices": ["Challenge him", "Ignore him and start running"]
+      }}
+    """
+
+    try:
+        res = self.llm.invoke(prompt)
+        llm_output = res.get("output", res) if isinstance(res, dict) else res
+
+        # Parse JSON if returned as string
+        if isinstance(llm_output, str):
+            import json
+            llm_output = json.loads(llm_output)
+
+        dialogue = llm_output.get("dialogue", "The story continues...")
+        choices = llm_output.get("choices", [])
+
+    except Exception as e:
+        # Fallback to dummy values if LLM fails
+        dialogue = f"An error occurred while generating scene: {str(e)}"
+        choices = []
+
+    # Construct event structure
+    event = {
+        "id": event_id,
+        "type": scene_type,
+        "bg": "forest_day.png",
+        "left": {"sprite": "tortoise_idle.png", "pos": [120, 250], "emotion": "calm"},
+        "right": {"sprite": "hare_idle.png", "pos": [420, 250], "emotion": "arrogant"},
+        "dialogue": dialogue,
+        "tts": {"voice": "sara-child", "rate": 0.95},
+        "choices": choices,
+        "delay": 2.5,
+        "metadata": {"emotion_tag": emotion_tag, "difficulty": "easy"},
+    }
+
+    return event
+
 
 
 # Provide a singleton agent instance for easy importing

@@ -2,7 +2,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
-from agent import get_agent
+from server.agent import get_agent
 
 app = FastAPI(title="VR Storytelling — Story Agent API", version="0.1.0")
 agent = get_agent()
